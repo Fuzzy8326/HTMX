@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Basic metadata setup for character encoding and responsive layout -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Include HTMX library for dynamic HTML interactions without full page reloads -->
+    <script src="https://unpkg.com/htmx.org@2.0.4"
+            integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous">
+    </script>
+
+    <!-- Page title -->
+    <title>BMI Calculator</title>
+
+    <!-- Import Bootstrap CSS for layout and styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!-- Custom internal CSS for additional styling -->
+    <style>
+        /* Set gradient background and layout spacing */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        /* Wrapper for calculator card */
+        .calculator-wrapper {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 2.5rem;
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        /* Title styling */
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Label and input styling */
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        /* Highlight input field on focus */
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        /* Input group icon area */
+        .input-group-text {
+            background-color: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-right: none;
+            border-radius: 10px 0 0 10px;
+            font-weight: 500;
+        }
+
+        /* Adjust borders for connected input fields */
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+        }
+
+        /* Primary button (Calculate) styling */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        /* Add hover effect to primary button */
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Secondary button (Clear) styling */
+        .btn-secondary {
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            width: 100%;
+        }
+
+        /* Small helper text below inputs */
+        .help-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        /* Where BMI results will appear */
+        #result {
+            margin-top: 1.5rem;
+        }
+
+        /* HTMX spinner visibility toggle */
+        .htmx-request .spinner {
+            display: inline-block;
+        }
+        .spinner {
+            display: none;
+        }
+
+        /* Layout for button group */
+        .btn-group-custom {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Main header -->
+        <h1>💪 BMI Calculator</h1>
+
+        <!-- Calculator container -->
+        <div class="calculator-wrapper">
+            <!-- HTMX-enabled form -->
+            <form
+                hx-trigger="submit"    
+                hx-post="/calculate" 
+                hx-target="#result"
+                hx-indicator=".spinner"
+            >
+
+                <!-- Height Input Section -->
+                <div class="mb-3">
+                    <label for="height" class="form-label">Height</label>
+                    <div class="input-group">
+                        <span class="input-group-text">📏</span> <!-- Height icon -->
+                        <input 
+                            id="height"
+                            name="height" 
+                            type="number" 
+                            step="0.01"
+                            min="0.5"
+                            max="3.0"
+                            class="form-control" 
+                            placeholder="1.75"
+                            required
+                        >
+                        <span class="input-group-text">meters</span>
+                    </div>
+                    <div class="help-text">Enter height in meters (e.g., 1.75)</div>
+                </div>
+
+                <!-- Weight Input Section -->
+                <div class="mb-4">
+                    <label for="weight" class="form-label">Weight</label>
+                    <div class="input-group">
+                        <span class="input-group-text">⚖️</span> <!-- Weight icon -->
+                        <input 
+                            id="weight"
+                            name="weight" 
+                            type="number" 
+                            step="0.1"
+                            min="20"
+                            max="300"
+                            class="form-control" 
+                            placeholder="70"
+                            required
+                        >
+                        <span class="input-group-text">kg</span>
+                    </div>
+                    <div class="help-text">Enter weight in kilograms</div>
+                </div>
+
+                <!-- Buttons for Calculate and Clear -->
+                <div class="btn-group-custom">
+                    <!-- Submit button triggers BMI calculation -->
+                    <button type="submit" class="btn btn-primary">
+                        Calculate BMI
+                        <!-- Spinner shown during HTMX request -->
+                        <span class="spinner spinner-border spinner-border-sm ms-2" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </span>
+                    </button>
+
+                    <!-- Clear button resets the form and clears result -->
+                    <button 
+                        type="button" 
+                        class="btn btn-secondary" 
+                        onclick="document.getElementById('result').innerHTML = ''; this.form.reset();">
+                        Clear
+                    </button>
+                </div>
+
+                <!-- Result area (HTMX response injected here) -->
+                <div id="result"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS bundle for interactivity (modals, etc.) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>
