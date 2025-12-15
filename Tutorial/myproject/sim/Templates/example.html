@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Form | Sim App</title>
+
+    <!-- HTMX -->
+    <script
+      src="https://unpkg.com/htmx.org@1.9.4"
+      integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV"
+      crossorigin="anonymous"
+    ></script>
+
+    {% load static %}
+    <!-- Global CSS -->
+   
+    <!-- Page-specific CSS -->
+    <link rel="stylesheet" href="{% static 'sim/css/example.css' %}">
+  <link rel="stylesheet" href="{% static 'sim/css/index.css' %}">
+  </head>
+
+  <body>
+    <div class="form-container">
+      <h1>Share Your Info 💬</h1>
+      <p class="subtitle">Please add your most valuable data (we promise not to sell it... maybe 😅)</p>
+
+      <form hx-post="{% url 'sample-post' %}" hx-target="#message" class="data-form">
+        {% csrf_token %}
+        <label>
+          Name
+          <input type="text" name="name" placeholder="Your name" required />
+        </label>
+
+        <label>
+          Email
+          <input type="email" name="email" placeholder="you@example.com" required />
+        </label>
+
+        <label>
+          Favourite Color
+          <input type="color" name="favourite_color" required />
+        </label>
+
+        <button type="submit" class="btn">Submit</button>
+      </form>
+
+      <div id="message"></div>
+
+      <a href="{% url 'index' %}" class="btn secondary back-btn">← Back to Home</a>
+    </div>
+  </body>
+</html>
